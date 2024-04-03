@@ -268,24 +268,25 @@ def about():
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
     form = ContactForm()
-    if request.method == "GET":
-        return render_template("contact.html", form=form)
-    elif request.method == "POST":
+    if request.method == "POST" and form.validate_on_submit():
         name = request.form["name"]
         email = request.form["email"]
         phone = request.form["phone"]
         message = request.form["message"]
 
-        with smtplib.SMTP("smtp.gmail.com") as connection:
-            connection.starttls()
-            connection.login(user=my_email, password=password)
-            connection.sendmail(from_addr=my_email,
-                                to_addrs=my_email,
-                                msg=f"Subject:Contact from BlogPost Site.\n\nName: {name}\n"
-                                    f"Email: {email}\n"
-                                    f"Phone Number: {phone}\n"
-                                    f"Message from user: {message}")
-        return render_template("contact.html", msg_sent=True, form=form)
+        try:
+            with smtplib.SMTP("smtp.gmail.com") as connection:
+                connection.starttls()
+                connection.login(user=my_email, password=password)
+                connection.sendmail(from_addr=my_email,
+                                    to_addrs=my_email,
+                                    msg=f"Subject:Contact from BlogPost Site.\n\nName: {name}\n"
+                                        f"Email: {email}\n"
+                                        f"Phone Number: {phone}\n"
+                                        f"Message from user: {message}")
+        except Exception as e:
+            flash(f"An error occurred while sending the message: {str(e)}", "error")
+    return render_template("contact.html", msg_sent=True, form=form)
 
 
 if __name__ == "__main__":

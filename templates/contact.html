@@ -33,6 +33,13 @@
         <div class="my-5">
           <!-- * * * * * * * * * * * * * * *-->
           <!-- * * Simplified SB Contact Form for the Tutorial* *-->
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                {% for message in messages %}
+                  <p class="flashes", style="color: red; ">{{ message }}</p>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
           {{ render_form(form, novalidate=True) }}
         </div>
       </div>
