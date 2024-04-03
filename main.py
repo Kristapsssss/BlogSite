@@ -12,7 +12,7 @@ from sqlalchemy import Integer, String, Text, ForeignKey
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 # Import forms from the forms.py
-from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
+from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm, ContactForm
 
 '''
 On Windows type:
@@ -267,26 +267,26 @@ def about():
 
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
+    form = ContactForm()
     if request.method == "GET":
-        return render_template("contact.html")
+        return render_template("contact.html", form=form)
     elif request.method == "POST":
         name = request.form["name"]
         email = request.form["email"]
         phone = request.form["phone"]
         message = request.form["message"]
-        try:
-            with smtplib.SMTP("smtp.gmail.com") as connection:
-                connection.starttls()
-                connection.login(user=my_email, password=password)
-                connection.sendmail(from_addr=my_email,
-                                    to_addrs=my_email,
-                                    msg=f"Subject:Contact from BlogPost Site.\n\nName: {name}\n"
-                                        f"Email: {email}\n"
-                                        f"Phone Number: {phone}\n"
-                                        f"Message from user: {message}")
-            return render_template("contact.html", msg_sent=True)
-        except Exception as e:
-            return render_template("contact.html")
+
+        with smtplib.SMTP("smtp.gmail.com") as connection:
+            connection.starttls()
+            connection.login(user=my_email, password=password)
+            connection.sendmail(from_addr=my_email,
+                                to_addrs=my_email,
+                                msg=f"Subject:Contact from BlogPost Site.\n\nName: {name}\n"
+                                    f"Email: {email}\n"
+                                    f"Phone Number: {phone}\n"
+                                    f"Message from user: {message}")
+        return render_template("contact.html", msg_sent=True, form=form)
+
 
 if __name__ == "__main__":
     app.run(debug=False)
